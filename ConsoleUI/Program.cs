@@ -2,10 +2,27 @@
 using DataAccessLayer.Concrete.EntityFramework;
 using DataAccessLayer.Concrete.InMemory;
 using EntityLayer.Concrete;
+using EntityLayer.DTOs;
 using System.Text;
 
-ProductManager product = new ProductManager(new EFProductDal());
-foreach (Product products in product.GetByUnitPrice(2,40))
+ProductTest();
+
+CategoryTest();
+
+static void ProductTest()
 {
-    Console.WriteLine(products.ProductName);
+    ProductManager product = new ProductManager(new EFProductDal());
+    foreach (ProductDetailDto products in product.GetProductDetails().Data)
+    {
+        Console.WriteLine(products.ProductName);
+    }
+}
+
+static void CategoryTest()
+{
+    CategoryManager categoryManager = new CategoryManager(new EFCategoryDal());
+    foreach (Category category in categoryManager.GetAll())
+    {
+        Console.WriteLine(category.CategoryName);
+    }
 }

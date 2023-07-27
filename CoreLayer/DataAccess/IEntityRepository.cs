@@ -1,5 +1,4 @@
-﻿using EntityLayer.Abstract;
-using EntityLayer.Concrete;
+﻿using CoreLayer.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +6,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataAccessLayer.Abstract
+namespace CoreLayer.DataAccess
 {
     public interface IEntityRepository<T>  where T : class,IEntity, new()
     {
