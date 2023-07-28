@@ -17,7 +17,7 @@ namespace CoreLayer.Aspects.Autofac.Validation
         {
             if (!typeof(IValidator).IsAssignableFrom(validatorType))
             {
-                throw new System.Exception("Bu bir dogrulama deyil"); //AspectMessages.WrongValidationType
+                throw new System.Exception("Bu bir dogrulama snifi deyil"); //AspectMessages.WrongValidationType
             }
 
             _validatorType = validatorType;

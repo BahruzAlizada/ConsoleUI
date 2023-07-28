@@ -1,8 +1,10 @@
 ﻿using BusinessLayer.Abstract;
+using BusinessLayer.CCS;
 using BusinessLayer.Constants;
 using BusinessLayer.ValidationRules.FluentValidation;
 using CoreLayer.Aspects.Autofac.Validation;
 using CoreLayer.CrossCuttingConcerns.Validation;
+using CoreLayer.Utilities.Business;
 using CoreLayer.Utilities.Results.Abstract;
 using CoreLayer.Utilities.Results.Concrete;
 using DataAccessLayer.Abstract;
@@ -21,9 +23,11 @@ namespace BusinessLayer.Concrete
     public class ProductManager : IProductService
     {
         IProductDal _productDal;
-        public ProductManager(IProductDal productDal)
+        ICategoryService _categoryService;
+        public ProductManager(IProductDal productDal,ICategoryService categoryService)
         {
             _productDal = productDal;
+            _categoryService = categoryService;
         }
 
 
@@ -31,13 +35,11 @@ namespace BusinessLayer.Concrete
         public IResult Add(Product product)
         {
             //Business Code
-            if (product.ProductName.Length < 2)
-            {
-                return new ErrorResult(Messages.ProductNameInvalid);
+              IResult result=  BusinessRules.Run(CheckIfCategoryProductCountOfCategoryCorrect(product.CategoryId),
+                CheckIfProductNameExist(product.ProductName),CheckIfCategoryCountCorrect());
 
-            }
-
-          
+            if (result != null)
+                return result;
 
             _productDal.Add(product);
             return new SuccessResult(Messages.ProductAdded);
@@ -73,5 +75,37 @@ namespace BusinessLayer.Concrete
         {
             return new SuccessDataResult<List<ProductDetailDto>>(_productDal.GetProductDetails());
         }
+
+
+        #region Business Code
+        private IResult CheckIfCategoryProductCountOfCategoryCorrect(int categoryId)
+        {
+            var result = _productDal.GetAll(x => x.CategoryId == categoryId).Count();
+            if (result > 10)
+                return new ErrorResult(Messages.ProductCountOfCategory);
+
+            return new SuccessResult();
+        }
+
+        private IResult CheckIfProductNameExist(string productName)
+        {
+            var result = _productDal.GetAll(x => x.ProductName == productName).Any();
+             
+            if (result)
+                return new ErrorResult(Messages.ProductNameAlreadyExist);
+
+            return new SuccessResult();
+        }
+
+        private IResult CheckIfCategoryCountCorrect()
+        {
+            var result = _categoryService.GetAll();
+            if(result.Data.Count>15)
+            {
+                return new ErrorResult(Messages.ProductCountOfCategory);
+            }
+            return new SuccessResult();
+        }
+        #endregion
     }
 }
