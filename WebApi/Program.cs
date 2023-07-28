@@ -1,11 +1,17 @@
-﻿using Autofac.Extensions.DependencyInjection;
+﻿using Autofac;
+using Autofac.Extensions.DependencyInjection;
 using BusinessLayer.Abstract;
 using BusinessLayer.Concrete;
+using BusinessLayer.DependencyResolvers.Autofac;
 using DataAccessLayer.Abstract;
 using DataAccessLayer.Concrete.EntityFramework;
 
 var builder = WebApplication.CreateBuilder(args);
-Host.CreateDefaultBuilder(args).UseServiceProviderFactory(new AutofacServiceProviderFactory());
+Host.CreateDefaultBuilder(args).UseServiceProviderFactory(new AutofacServiceProviderFactory())
+.ConfigureContainer<ContainerBuilder>(builder =>
+{
+    builder.RegisterModule(new AutofacBusinessModule());
+});
 
 // Add services to the container.
 //Autofac,Ninject,CastleWindsor,StructoreMap,LightInject,DryInject-->IoC Container
